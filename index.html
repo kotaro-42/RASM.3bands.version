@@ -51,32 +51,27 @@
                     </div>
                 </div>
 
-                <!-- ───────── Setting ───────── -->
+                <!-- ───────── Setting : Sample Rate ───────── -->
                 <div class="setting-section">
                     <h2 class="section-title">Sample rate</h2>
                     <div class="setting-control">
 
-                        <div class="slider-group">
-                            <div class="slider-label-container">
-                            </div>
+                        <!-- 上：48kHz -->
+                        <span class="volume-label">48kHz</span>
 
-                            <div class="vertical-slider-container">
-                                <div class="slider-ticks" data-steps="1"></div>
-                                <input
-                                    type="range"
-                                    id="samplerate-slider"
-                                    class="vertical-slider"
-                                    min="0"
-                                    max="1"
-                                    step="1"
-                                >
-                            </div>
-
-                            <div class="slider-range-labels">
-                                <span>44.1kHz</span>
-                                <span>48kHz</span>
-                            </div>
+                        <div class="vertical-slider-container">
+                            <input
+                                type="range"
+                                id="samplerate-slider"
+                                class="vertical-slider"
+                                min="0"
+                                max="1"
+                                step="1"
+                            >
                         </div>
+
+                        <!-- 下：44.1kHz -->
+                        <span class="volume-label">44.1kHz</span>
 
                     </div>
                 </div>
