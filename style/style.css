@@ -97,6 +97,7 @@ body {
     align-items: center;
 }
 
+/* Volume 専用ラベル */
 .volume-label {
     font-size: 14px;
     transform: translateX(-20px);
@@ -136,7 +137,10 @@ body {
     appearance: none;
 }
 
-/* Thumb（縦・横共通形状） */
+/* ─────────────────────────────
+   Thumb Shape（縦・横共通）
+────────────────────────────── */
+
 .vertical-slider::-webkit-slider-thumb,
 .horizontal-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -188,24 +192,27 @@ body {
 }
 
 /* ─────────────────────────────
-   Setting (Sample Rate)
+   Setting : Sample Rate
 ────────────────────────────── */
 
 .setting-control {
     padding: 20px;
 }
 
-/* Sample rate 専用（確実に勝つ） */
+/* Sample rate 用ラベル（唯一の制御点） */
 .setting-label {
-    transform: translateX(-60%);
+    position: relative;
+    left: 50%;
+    transform: translateX(-60%); /* ← ここを微調整 */
+    font-size: 14px;
 }
 
-/* 高さを詰める */
+/* Sample rate スライダー寸法 */
 .setting-section .vertical-slider-container {
     height: 120px;
 }
 
-/* 黒い縦棒を中央・短縮 */
+/* 黒い縦棒（中央・短縮） */
 .setting-section .vertical-slider-container::before {
     left: 50%;
     transform: translateX(-50%);
@@ -216,14 +223,6 @@ body {
 /* 可動域 */
 .setting-section .vertical-slider {
     height: 80px;
-}
-
-/* ラベル中央寄せ（px 指定） */
-.setting-section .volume-label {
-    position: relative;
-    left: 50%;
-    transform: translateX(-70%); /* ← 少し左へ寄せる */
-    font-size: 14px;
 }
 
 /* ─────────────────────────────
