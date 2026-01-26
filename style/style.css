@@ -1,0 +1,256 @@
+/* style.css */
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 40px;
+}
+
+:root {
+    --horizontal-thumb-overflow: 12px;
+}
+
+/* 背景 */
+#background {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#rnbo-root {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* タイトル */
+#custom-title {
+    font-size: 48px;
+    font-weight: 300;
+    margin-bottom: 40px;
+}
+
+/* ─────────────────────────────
+   Container（高さ揃えるために重要）
+────────────────────────────── */
+.controls-container {
+    display: flex;
+    gap: 80px;
+    align-items: stretch; /* ★ これで高さを揃える */
+}
+
+/* ───────── Volume ───────── */
+
+.volume-section {
+    flex: 1.5 1 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-title {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+.volume-control {
+    border: 2px solid #000;
+    padding: 20px 0;
+    flex: 1; /* ★ Tuning と高さ揃える */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Volume のラベル */
+.volume-label {
+    font-size: 14px;
+    transform: translateX(-20px);
+}
+
+/* ▼ 高さ揃えのキーパート ▼ */
+.vertical-slider-container {
+    position: relative;
+    width: 100%;
+    height: 450px; /* ★ 固定高さを指定 → これが底辺合わせの決め手 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+.vertical-slider {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    width: 6px;
+    height: 100%;
+    background: transparent;
+    appearance: none;
+}
+
+/* Volume 背景線 */
+.vertical-slider-container::before {
+    content: "";
+    position: absolute;
+    width: 2px;
+    top: 20px;
+    bottom: 20px;
+    background: #000;
+    left: calc(50% - 20px);
+}
+
+/* Meter */
+#meter {
+    width: 10px;
+    height: 100%;
+    border: 2px solid #000;
+    display: flex;
+    align-items: flex-end;
+}
+
+#bar {
+    width: 100%;
+    height: 0%;
+    background-color: #aef2f2;
+    transition: height 0.2s ease;
+}
+
+/* Volume thumb */
+.vertical-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 30px;
+    height: 20px;
+    background: #aef2f2;
+    border: 2px solid #000;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+.vertical-slider::-moz-range-thumb {
+    width: 30px;
+    height: 20px;
+    background: #aef2f2;
+    border: 2px solid #000;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+/* ───────── Tuning ───────── */
+
+.tuning-section {
+    flex: 8.5 1 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.tuning-control {
+    border: 2px solid #000;
+    padding: 40px;
+    flex: 1; /* ★ Volume と高さ揃える */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 均等配置 */
+}
+
+.slider-group {
+    margin-bottom: 40px;
+}
+.slider-group:last-child {
+    margin-bottom: 0;
+}
+
+.slider-label-container {
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.slider-label {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* -------------------------
+   Slider Base
+------------------------- */
+
+.horizontal-slider-container {
+    position: relative;
+    width: 100%;
+    height: 60px;
+}
+
+/* input range */
+.horizontal-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: calc(100% + (var(--horizontal-thumb-overflow) * 2));
+    margin-left: calc(-1 * var(--horizontal-thumb-overflow));
+    margin-right: calc(-1 * var(--horizontal-thumb-overflow));
+    height: 60px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+/* thumb */
+.horizontal-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 30px;
+    background: #aef2f2;
+    border: 2px solid #000;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+.horizontal-slider::-moz-range-thumb {
+    width: 20px;
+    height: 30px;
+    background: #aef2f2;
+    border: 2px solid #000;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+/* range labels */
+.slider-range-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+
+/* ticks (DOM ベース) */
+.slider-ticks {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 24px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.slider-ticks::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background: #000;
+    transform: translateY(-50%);
+}
+
+.slider-ticks .tick {
+    position: absolute;
+    top: 50%;
+    width: 2px;
+    height: 18px;
+    background: #000;
+    transform: translate(-1px, -50%);
+}

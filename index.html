@@ -1,0 +1,154 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    >
+    <meta name="theme-color" content="#000000">
+    <meta name="rnbo-version" content="1.0.0-alpha.5">
+
+    <title>RASM origin</title>
+    <link rel="stylesheet" href="style/style.css">
+</head>
+
+<body>
+    <!-- 背景（今は空のまま） -->
+    <svg id="background" width="100%" height="100%"></svg>
+
+    <div id="rnbo-root">
+        <h1 id="custom-title">RASM origin</h1>
+
+        <div class="controls-container">
+
+            <!-- ───────── Volume ───────── -->
+            <div class="volume-section">
+                <h2 class="section-title">Volume</h2>
+                <div class="volume-control">
+
+                    <span class="volume-label">high</span>
+
+                    <div class="vertical-slider-container">
+
+                        <!-- Volume：0〜10 （RNBO と一致） -->
+                        <input
+                            type="range"
+                            id="volume-slider"
+                            class="vertical-slider"
+                            min="0"
+                            max="10"
+                            step="0.1"
+                        >
+
+                        <div id="meter">
+                            <div id="bar"></div>
+                        </div>
+                    </div>
+
+                    <span class="volume-label">low</span>
+                </div>
+            </div>
+
+            <!-- ───────── Tuning ───────── -->
+            <div class="tuning-section">
+                <h2 class="section-title">Tuning</h2>
+                <div class="tuning-control">
+
+                    <!-- Sensitivity（0〜12：12 区間 → 13 ポジション） -->
+                    <div class="slider-group">
+                        <div class="slider-label-container">
+                            <span class="slider-label">sensitivity</span>
+                        </div>
+                        <div class="horizontal-slider-container">
+                            <!-- data-steps = 区間数（0〜12 → 12 区間） -->
+                            <div class="slider-ticks" data-steps="12"></div>
+                            <input
+                                type="range"
+                                id="sensitivity-slider"
+                                class="horizontal-slider"
+                                min="0"
+                                max="12"
+                                step="1"
+                            >
+                        </div>
+                        <div class="slider-range-labels">
+                            <span>low</span><span>high</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamics（0〜4：4 区間 → 5 ポジション） -->
+                    <div class="slider-group">
+                        <div class="slider-label-container">
+                            <span class="slider-label">dynamics</span>
+                        </div>
+                        <div class="horizontal-slider-container">
+                            <div class="slider-ticks" data-steps="4"></div>
+                            <input
+                                type="range"
+                                id="dynamics-slider"
+                                class="horizontal-slider"
+                                min="0"
+                                max="4"
+                                step="1"
+                            >
+                        </div>
+                        <div class="slider-range-labels">
+                            <span>low</span><span>high</span>
+                        </div>
+                    </div>
+
+                    <!-- Responsiveness（0〜10：10 区間 → 11 ポジション） -->
+                    <div class="slider-group">
+                        <div class="slider-label-container">
+                            <span class="slider-label">responsiveness</span>
+                        </div>
+                        <div class="horizontal-slider-container">
+                            <div class="slider-ticks" data-steps="10"></div>
+                            <input
+                                type="range"
+                                id="responsiveness-slider"
+                                class="horizontal-slider"
+                                min="0"
+                                max="10"
+                                step="1"
+                            >
+                        </div>
+                        <div class="slider-range-labels">
+                            <span>low</span><span>high</span>
+                        </div>
+                    </div>
+
+                    <!-- Release（0〜10：10 区間 → 11 ポジション） -->
+                    <div class="slider-group">
+                        <div class="slider-label-container">
+                            <span class="slider-label">release</span>
+                        </div>
+                        <div class="horizontal-slider-container">
+                            <div class="slider-ticks" data-steps="10"></div>
+                            <input
+                                type="range"
+                                id="release-slider"
+                                class="horizontal-slider"
+                                min="0"
+                                max="10"
+                                step="1"
+                            >
+                        </div>
+                        <div class="slider-range-labels">
+                            <span>short</span><span>long</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/guardrails.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
