@@ -217,7 +217,7 @@ body {
 .setting-section .volume-label {
     position: relative;
     left: 50%;
-    transform: translateX(-60%); /* ← 少し左へ寄せる */
+    transform: translateX(-70%); /* ← 少し左へ寄せる */
     font-size: 14px;
 }
 
