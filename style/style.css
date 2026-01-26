@@ -101,23 +101,31 @@ body {
     gap: 30px;
 }
 
-/* 黒い縦ガイド線を中央に */
+.setting-section .vertical-slider-container {
+    height: 120px;
+    justify-content: center;
+}
+
+/* 黒い縦棒（可動域と同じ長さに） */
 .setting-section .vertical-slider-container::before {
     left: 50%;
     transform: translateX(-50%);
-    top: 10px;
-    bottom: 10px;
+    top: 20px;      /* ← 水色ツマミの上限 */
+    bottom: 20px;   /* ← 水色ツマミの下限 */
 }
 
-/* スライダー本体の高さ */
+/* 水色ツマミの可動域 */
 .setting-section .vertical-slider {
-    height: 80px;
+    height: 80px;   /* 120 - 20*2 = 80 */
 }
 
-/* ラベル位置調整 */
+/* 48kHz / 44.1kHz ラベルを強制的に中央へ */
 .setting-section .volume-label {
     transform: none;
-    text-align: center;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
 }
 
 .vertical-slider {
