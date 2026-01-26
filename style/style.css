@@ -101,18 +101,23 @@ body {
     gap: 30px;
 }
 
-.setting-section .vertical-slider-container {
-    height: 120px;       /* ← 縦を縮める（ここが主調整） */
-    justify-content: center;
+/* 黒い縦ガイド線を中央に */
+.setting-section .vertical-slider-container::before {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 10px;
+    bottom: 10px;
 }
 
-/* メーターが無い分、下余白を殺す */
-.setting-section #meter {
-    display: none;
-}
-
+/* スライダー本体の高さ */
 .setting-section .vertical-slider {
-    height: 80px;        /* 実際に動く範囲 */
+    height: 80px;
+}
+
+/* ラベル位置調整 */
+.setting-section .volume-label {
+    transform: none;
+    text-align: center;
 }
 
 .vertical-slider {
