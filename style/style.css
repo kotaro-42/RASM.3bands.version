@@ -215,10 +215,9 @@ body {
 
 /* ラベル中央寄せ（px 指定） */
 .setting-section .volume-label {
-    transform: none;
     position: relative;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-60%); /* ← 少し左へ寄せる */
     font-size: 14px;
 }
 
