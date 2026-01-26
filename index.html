@@ -15,23 +15,24 @@
 </head>
 
 <body>
-    <!-- 背景（今は空のまま） -->
+    <!-- 背景 -->
     <svg id="background" width="100%" height="100%"></svg>
 
     <div id="rnbo-root">
         <h1 id="custom-title">RASM 3 bands version</h1>
 
         <div class="controls-container">
+
+            <!-- ───────── LEFT COLUMN ───────── -->
             <div class="left-column">
-    
+
                 <!-- ───────── Volume ───────── -->
                 <div class="volume-section">
                     <h2 class="section-title">Volume</h2>
                     <div class="volume-control">
                         <span class="volume-label">high</span>
+
                         <div class="vertical-slider-container">
-    
-                            <!-- Volume：0〜10 （RNBO と一致） -->
                             <input
                                 type="range"
                                 id="volume-slider"
@@ -40,29 +41,27 @@
                                 max="10"
                                 step="0.1"
                             >
-    
+
                             <div id="meter">
                                 <div id="bar"></div>
                             </div>
                         </div>
-    
+
                         <span class="volume-label">low</span>
                     </div>
                 </div>
-    
-                
+
+                <!-- ───────── Setting ───────── -->
                 <div class="setting-section">
                     <h2 class="section-title">Setting</h2>
                     <div class="setting-control">
-                        <div class="vertical-slider-container">
-                        <!-- Sample Rate（0 or 1） -->
+
                         <div class="slider-group">
                             <div class="slider-label-container">
                                 <span class="slider-label">sample rate</span>
                             </div>
-                
+
                             <div class="horizontal-slider-container">
-                                <!-- 2択なので ticks = 1 -->
                                 <div class="slider-ticks" data-steps="1"></div>
                                 <input
                                     type="range"
@@ -73,24 +72,29 @@
                                     step="1"
                                 >
                             </div>
-                
+
                             <div class="slider-range-labels">
-                                <span>44.1kHz</span><span>48kHz</span>
+                                <span>44.1kHz</span>
+                                <span>48kHz</span>
                             </div>
                         </div>
 
-            <!-- ───────── Tuning ───────── -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ───────── RIGHT COLUMN : Tuning ───────── -->
             <div class="tuning-section">
                 <h2 class="section-title">Tuning</h2>
                 <div class="tuning-control">
 
-                    <!-- Sensitivity（0〜12：12 区間 → 13 ポジション） -->
+                    <!-- Sensitivity -->
                     <div class="slider-group">
                         <div class="slider-label-container">
                             <span class="slider-label">sensitivity</span>
                         </div>
                         <div class="horizontal-slider-container">
-                            <!-- data-steps = 区間数（0〜12 → 12 区間） -->
                             <div class="slider-ticks" data-steps="12"></div>
                             <input
                                 type="range"
@@ -106,7 +110,7 @@
                         </div>
                     </div>
 
-                    <!-- Dynamics（0〜4：4 区間 → 5 ポジション） -->
+                    <!-- Dynamics -->
                     <div class="slider-group">
                         <div class="slider-label-container">
                             <span class="slider-label">dynamics</span>
@@ -127,7 +131,7 @@
                         </div>
                     </div>
 
-                    <!-- Responsiveness（0〜10：10 区間 → 11 ポジション） -->
+                    <!-- Responsiveness -->
                     <div class="slider-group">
                         <div class="slider-label-container">
                             <span class="slider-label">responsiveness</span>
@@ -148,7 +152,7 @@
                         </div>
                     </div>
 
-                    <!-- Release（0〜10：10 区間 → 11 ポジション） -->
+                    <!-- Release -->
                     <div class="slider-group">
                         <div class="slider-label-container">
                             <span class="slider-label">release</span>
@@ -167,9 +171,11 @@
                         <div class="slider-range-labels">
                             <span>short</span><span>long</span>
                         </div>
-                    </div>            
+                    </div>
+
                 </div>
             </div>
+
         </div>
     </div>
 
