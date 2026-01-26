@@ -203,7 +203,7 @@ body {
 .setting-label {
     position: relative;
     left: 50%;
-    transform: translateX(-60%); /* ← ここを微調整 */
+    transform: translateX(-50%); /* ← ここを微調整 */
     font-size: 14px;
 }
 
