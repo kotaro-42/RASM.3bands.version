@@ -195,6 +195,11 @@ body {
     padding: 20px;
 }
 
+/* Sample rate 専用（確実に勝つ） */
+.setting-label {
+    transform: translateX(-60%);
+}
+
 /* 高さを詰める */
 .setting-section .vertical-slider-container {
     height: 120px;
