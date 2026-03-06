@@ -237,7 +237,11 @@ function updateMeter(level) {
     bar.style.height = `${clamped * 100}%`;
 }
 
-
+setTimeout(() => {
+    rnboDevice.parameters.forEach(p => {
+        p.value = p.value;
+    });
+}, 500);
 
 // =====================================
 setup();
