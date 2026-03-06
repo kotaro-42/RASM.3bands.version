@@ -237,11 +237,20 @@ function updateMeter(level) {
     bar.style.height = `${clamped * 100}%`;
 }
 
+generateAllTicks();
+
+// ↓ここに追加
 setTimeout(() => {
-    rnboDevice.parameters.forEach(p => {
-        p.value = p.value;
-    });
-}, 500);
+    const p = device.parameters.find(x => x.name === "sensitivity");
+    if (!p) return;
+
+    p.value = 8;
+
+    setTimeout(() => {
+        p.value = 6;
+    }, 50);
+
+}, 300);
 
 // =====================================
 setup();
