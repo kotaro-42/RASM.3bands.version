@@ -58,6 +58,19 @@ async function setup() {
     // 呼び出し順
     connectCustomSliders(device);  // RNBO param <-> Slider
     generateAllTicks();            // 各スライダーに ticks を DOM 生成
+
+    // RNBO パッチ起動トリガー：sensitivity を微小変化させて初期化を促す
+    setTimeout(() => {
+        const p = device.parameters.find(x => x.name === "sensitivity");
+        if (!p) return;
+
+        p.value = 8;
+
+        setTimeout(() => {
+            p.value = 6;
+        }, 50);
+
+    }, 300);
 }
 
 
@@ -236,21 +249,6 @@ function updateMeter(level) {
     const clamped = Math.max(0, Math.min(1, level));
     bar.style.height = `${clamped * 100}%`;
 }
-
-generateAllTicks();
-
-// ↓ここに追加
-setTimeout(() => {
-    const p = device.parameters.find(x => x.name === "sensitivity");
-    if (!p) return;
-
-    p.value = 8;
-
-    setTimeout(() => {
-        p.value = 6;
-    }, 50);
-
-}, 300);
 
 // =====================================
 setup();
