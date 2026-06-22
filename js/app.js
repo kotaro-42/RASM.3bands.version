@@ -50,27 +50,31 @@ async function setup() {
         console.error("Microphone error:", e);
     }
 
-    // Resume on click
-    document.body.onclick = () => context.resume();
-
     startMeterLoop(analyser, meterBuffer);
 
     // 呼び出し順
     connectCustomSliders(device);  // RNBO param <-> Slider
     generateAllTicks();            // 各スライダーに ticks を DOM 生成
 
-    // RNBO パッチ起動トリガー：sensitivity を微小変化させて初期化を促す
-    setTimeout(() => {
+    // AudioContext 再開後に sensitivity をジグルしてパッチを初期化する
+    let patchInitialized = false;
+    const initPatch = () => {
+        if (patchInitialized) return;
+        patchInitialized = true;
         const p = device.parameters.find(x => x.name === "sensitivity");
         if (!p) return;
+        const saved = p.value;
+        p.value = saved >= 1 ? saved - 1 : saved + 1;
+        setTimeout(() => { p.value = saved; }, 50);
+    };
 
-        p.value = 8;
+    // 自動起動を試みる（localhost など許可環境では即時起動）
+    context.resume().then(initPatch);
 
-        setTimeout(() => {
-            p.value = 6;
-        }, 50);
-
-    }, 300);
+    // ドラッグ開始も含む最初のユーザー操作で確実に起動
+    document.body.addEventListener('pointerdown', () => {
+        context.resume().then(initPatch);
+    }, { once: true });
 }
 
 
