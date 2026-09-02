@@ -313,6 +313,128 @@ function updateMeter(level) {
 }
 
 // =====================================
+// ヘルプメモ（PC: ホバー追従ボックス / スマホ: 行追加トグル）
+// =====================================
+function setupHelpTooltips() {
+    const tip = document.getElementById("help-tooltip");
+    const bodyEl = tip?.querySelector(".help-tooltip-body");
+    if (!tip || !bodyEl) return;
+
+    const mobileQuery = window.matchMedia("(max-width: 480px)");
+    let pcActive = null;
+    let mobileOpenTrigger = null;
+
+    const isMobile = () => mobileQuery.matches;
+
+    const helpTextOf = (el) =>
+        el.getAttribute("data-help") ||
+        el.closest("[data-help]")?.getAttribute("data-help") ||
+        "";
+
+    const hidePcTip = () => {
+        pcActive = null;
+        tip.classList.remove("is-visible");
+        tip.setAttribute("aria-hidden", "true");
+    };
+
+    const placePcTip = (clientX, clientY) => {
+        const pad = 12;
+        const offsetX = 14;
+        const offsetY = 18;
+        const rect = tip.getBoundingClientRect();
+        let left = clientX + offsetX;
+        let top = clientY + offsetY;
+
+        if (left + rect.width > window.innerWidth - pad) {
+            left = clientX - rect.width - offsetX;
+        }
+        if (top + rect.height > window.innerHeight - pad) {
+            top = clientY - rect.height - offsetY;
+        }
+        tip.style.left = `${Math.max(pad, left)}px`;
+        tip.style.top = `${Math.max(pad, top)}px`;
+    };
+
+    const showPcTip = (el, clientX, clientY) => {
+        if (isMobile()) return;
+        const text = helpTextOf(el);
+        if (!text) return;
+        bodyEl.textContent = text;
+        tip.classList.add("is-visible");
+        tip.setAttribute("aria-hidden", "false");
+        pcActive = el;
+        placePcTip(clientX, clientY);
+    };
+
+    const closeAllMobilePanels = () => {
+        document.querySelectorAll(".help-panel.is-open").forEach((panel) => {
+            panel.classList.remove("is-open");
+            panel.setAttribute("aria-hidden", "true");
+            panel.textContent = "";
+        });
+        mobileOpenTrigger = null;
+    };
+
+    const panelForTrigger = (trigger) => {
+        const next = trigger.nextElementSibling;
+        if (next && next.classList.contains("help-panel")) return next;
+        return null;
+    };
+
+    // PC: mouse イベントで確実に表示
+    document.querySelectorAll("[data-help]").forEach((el) => {
+        el.addEventListener("mouseenter", (e) => {
+            if (isMobile()) return;
+            showPcTip(el, e.clientX, e.clientY);
+        });
+        el.addEventListener("mousemove", (e) => {
+            if (isMobile() || pcActive !== el) return;
+            placePcTip(e.clientX, e.clientY);
+        });
+        el.addEventListener("mouseleave", () => {
+            if (isMobile()) return;
+            if (pcActive === el) hidePcTip();
+        });
+    });
+
+    // スマホ: 文字タップで直下に行を追加（レイアウトが押し下がる）
+    document.querySelectorAll(".help-trigger").forEach((trigger) => {
+        trigger.addEventListener("click", (e) => {
+            if (!isMobile()) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const panel = panelForTrigger(trigger);
+            const text = helpTextOf(trigger);
+            if (!panel || !text) return;
+
+            if (mobileOpenTrigger === trigger) {
+                closeAllMobilePanels();
+                return;
+            }
+
+            closeAllMobilePanels();
+            panel.textContent = text;
+            panel.classList.add("is-open");
+            panel.setAttribute("aria-hidden", "false");
+            mobileOpenTrigger = trigger;
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!isMobile() || !mobileOpenTrigger) return;
+        if (e.target.closest(".help-trigger") || e.target.closest(".help-panel")) return;
+        closeAllMobilePanels();
+    });
+
+    mobileQuery.addEventListener("change", () => {
+        hidePcTip();
+        closeAllMobilePanels();
+    });
+}
+
+// =====================================
 // RNBO 接続前でも HTML 初期値で塗りを合わせる
 syncAllHorizontalFills();
+setupHelpTooltips();
 setup();

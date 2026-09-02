@@ -20,9 +20,24 @@
 
     <div id="rnbo-root">
         <div class="title-row">
-            <h1 id="custom-title">RASM demo</h1>
+            <div class="title-heading">
+                <h1
+                    id="custom-title"
+                    class="help-trigger"
+                    data-help="マイクによる環境音取得を前提とした追従型の快適音出力システム。ピンクノイズに調整を加えるシステムのみのdemo版"
+                >RASM demo</h1>
+                <div class="help-panel" aria-hidden="true"></div>
+            </div>
 
-            <div class="title-volume">
+            <div
+                class="title-volume"
+                data-help="出力の音量を調節するボリュームメーター。音が単に小さい場合右へ。"
+            >
+                <span
+                    class="title-volume-label help-trigger"
+                    data-help="出力の音量を調節するボリュームメーター。音が単に小さい場合右へ。"
+                >volume</span>
+                <div class="help-panel" aria-hidden="true"></div>
                 <div class="horizontal-slider-container volume-slider-container">
                     <!-- volume 0〜10（11段階）→ steps=10。両端目盛りは描画しない -->
                     <div class="slider-ticks" data-steps="10"></div>
@@ -40,8 +55,11 @@
                 </div>
             </div>
 
-            <div class="title-samplerate">
-                <!-- オフ=48kHz（初期） / オン=44.1kHz -->
+            <div
+                class="title-samplerate"
+                data-help="サンプルレートの選択。基本48kHzのままで問題ないです。"
+            >
+                <!-- オフ=48kHz（初期） / オン=44.1kHz / スマホでは非表示 -->
                 <label class="sr-switch" for="samplerate-toggle">
                     <input
                         type="checkbox"
@@ -64,8 +82,15 @@
                 <div class="tuning-control">
 
                     <!-- Sensitivity -->
-                    <div class="slider-group">
-                        <span class="slider-label">sensitivity</span>
+                    <div
+                        class="slider-group"
+                        data-help="小さい音に反応する度合いを調節。もっとマスキングしたい場合右へ。"
+                    >
+                        <span
+                            class="slider-label help-trigger"
+                            data-help="小さい音に反応する度合いを調節。もっとマスキングしたい場合右へ。"
+                        >sensitivity</span>
+                        <div class="help-panel" aria-hidden="true"></div>
                         <div class="horizontal-slider-container">
                             <div class="slider-ticks" data-steps="12"></div>
                             <!-- RNBO sensitivity.initialValue=7・UIは逆転表示なので 12-7=5 -->
@@ -82,8 +107,15 @@
                     </div>
 
                     <!-- Dynamics -->
-                    <div class="slider-group">
-                        <span class="slider-label">dynamics</span>
+                    <div
+                        class="slider-group"
+                        data-help="最大音を出す閾値を調節。変化があまりないと感じる場合右へ。"
+                    >
+                        <span
+                            class="slider-label help-trigger"
+                            data-help="最大音を出す閾値を調節。変化があまりないと感じる場合右へ。"
+                        >dynamics</span>
+                        <div class="help-panel" aria-hidden="true"></div>
                         <div class="horizontal-slider-container">
                             <div class="slider-ticks" data-steps="4"></div>
                             <!-- RNBO dynamics.initialValue=4 -->
@@ -100,8 +132,15 @@
                     </div>
 
                     <!-- Responsiveness -->
-                    <div class="slider-group">
-                        <span class="slider-label">responsiveness</span>
+                    <div
+                        class="slider-group"
+                        data-help="どのくらい騒音上昇についていくかを調節。もう少し反応している感が欲しい場合右へ。"
+                    >
+                        <span
+                            class="slider-label help-trigger"
+                            data-help="どのくらい騒音上昇についていくかを調節。もう少し反応している感が欲しい場合右へ。"
+                        >responsiveness</span>
+                        <div class="help-panel" aria-hidden="true"></div>
                         <div class="horizontal-slider-container">
                             <div class="slider-ticks" data-steps="10"></div>
                             <!-- RNBO responsiveness.initialValue=4・UIは逆転表示なので 10-4=6 -->
@@ -118,8 +157,15 @@
                     </div>
 
                     <!-- Release -->
-                    <div class="slider-group">
-                        <span class="slider-label">release</span>
+                    <div
+                        class="slider-group"
+                        data-help="どのくらい環境音の下降についていくかを調節。もう少しマスキングが尾を引いて欲しい場合右へ。"
+                    >
+                        <span
+                            class="slider-label help-trigger"
+                            data-help="どのくらい環境音の下降についていくかを調節。もう少しマスキングが尾を引いて欲しい場合右へ。"
+                        >release</span>
+                        <div class="help-panel" aria-hidden="true"></div>
                         <div class="horizontal-slider-container">
                             <div class="slider-ticks" data-steps="10"></div>
                             <!-- RNBO release.initialValue=4 -->
@@ -139,6 +185,11 @@
             </div>
 
         </div>
+    </div>
+
+    <!-- PC専用: カーソル追従ヘルプ -->
+    <div id="help-tooltip" class="help-tooltip" aria-hidden="true">
+        <div class="help-tooltip-body"></div>
     </div>
 
     <!-- Scripts -->

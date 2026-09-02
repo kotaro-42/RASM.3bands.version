@@ -84,12 +84,16 @@ body {
     margin-bottom: clamp(36px, 6vw, 60px);
 }
 
+.title-heading {
+    flex-shrink: 0;
+    min-width: 0;
+}
+
 #custom-title {
     font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
     font-size: clamp(28px, 5vw, 48px);
     font-weight: 700;
     margin: 0;
-    flex-shrink: 0;
 }
 
 .title-volume {
@@ -98,6 +102,15 @@ body {
     align-items: center;
     gap: 12px;
     min-width: 160px;
+}
+
+/* スマホのみ表示 */
+.title-volume-label {
+    display: none;
+    font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .title-volume .horizontal-slider-container {
@@ -365,11 +378,11 @@ body {
 }
 
 .volume-slider-container .horizontal-slider::-webkit-slider-thumb {
-    background: #000;
+    background: var(--slider-line-color);
 }
 
 .volume-slider-container .horizontal-slider::-moz-range-thumb {
-    background: #000;
+    background: var(--slider-line-color);
 }
 
 .volume-meter-fill {
@@ -385,6 +398,74 @@ body {
     transition: width 0.1s ease;
     z-index: 0;
     pointer-events: none;
+}
+
+/* ─────────────────────────────
+   Help (PC: 追従ボックス / スマホ: インライン展開)
+────────────────────────────── */
+
+.help-tooltip {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    display: none;
+    max-width: min(280px, calc(100vw - 24px));
+    padding: 12px 14px;
+    border: 1px solid var(--slider-line-color);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    color: #000;
+    pointer-events: none;
+}
+
+.help-tooltip.is-visible {
+    display: block;
+}
+
+.help-tooltip-body {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: #333;
+}
+
+/* スマホ用インライン展開（PCでは非表示） */
+.help-panel {
+    display: none;
+    width: 100%;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: #333;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+}
+
+.help-trigger {
+    cursor: inherit;
+}
+
+@media (max-width: 480px) {
+    .help-trigger {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* PC追従ボックスは使わない */
+    .help-tooltip {
+        display: none !important;
+    }
+
+    .help-panel.is-open {
+        display: block;
+        max-height: 200px;
+        opacity: 1;
+        padding: 4px 0 8px;
+    }
 }
 
 /* ─────────────────────────────
@@ -415,11 +496,12 @@ body {
 
     .title-row {
         flex-wrap: wrap;
-        align-items: center;
+        /* 説明展開時も 44.1kHz がタイトル行上端に残るよう上揃え */
+        align-items: flex-start;
         row-gap: 16px;
     }
 
-    #custom-title {
+    .title-heading {
         flex: 1 1 auto;
         min-width: 0;
     }
@@ -457,6 +539,23 @@ body {
         --slider-tick-width: 1px;
         --slider-row-height: 50px;
         --page-top: var(--page-top-mobile);
+    }
+
+    /* スマホでは 44.1kHz スイッチ関連を出さない */
+    .title-samplerate {
+        display: none !important;
+    }
+
+    .title-volume {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .title-volume-label {
+        display: block;
+        width: 100%;
+        text-align: left;
     }
 
     .tuning-control {
