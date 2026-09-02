@@ -162,7 +162,8 @@ function stepFromRnboParam(p) {
 
 function updateHorizontalFill(slider) {
     const container = slider.closest(".horizontal-slider-container");
-    if (!container) return;
+    // Volume は実音量メーターを使うため、パラメータ塗りは適用しない
+    if (!container || container.classList.contains("volume-slider-container")) return;
 
     const min = Number(slider.min);
     const max = Number(slider.max);
@@ -295,7 +296,8 @@ function startMeterLoop(analyser, buffer) {
         const rms = Math.sqrt(sum / buffer.length);
         // 過大なクリップを避けるため少し持ち上げる
         const normalized = Math.min(1, rms * 10);
-        updateMeter(normalized);
+        // 見た目上は 3 倍。シリンダーを超える分は満タン表示
+        updateMeter(Math.min(1, normalized * 3));
         requestAnimationFrame(tick);
     };
 
@@ -307,7 +309,7 @@ function updateMeter(level) {
     if (!bar) return;
 
     const clamped = Math.max(0, Math.min(1, level));
-    bar.style.height = `${clamped * 100}%`;
+    bar.style.width = `${clamped * 100}%`;
 }
 
 // =====================================

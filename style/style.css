@@ -9,18 +9,39 @@
 }
 
 :root {
-    --slider-track-thickness: 5px;
-    /* シリンダーつまみ: レールを横切る長い辺 / 進行方向の短い辺 */
-    --slider-thumb-cross: 26px;
-    --slider-thumb-along: 11px;
-    --horizontal-thumb-overflow: calc(var(--slider-thumb-along) / 2);
+    /* シリンダー寸法（段階的に細くする。基準はデスクトップ） */
+    --slider-track-thickness: 10px;
+    --slider-track-border: 1px;
+    --slider-tick-width: 1px;
+    --slider-row-height: 60px;
+    /* オフ時 44.1kHz と同じ灰色 */
+    --slider-line-color: #999;
+    /* Tuning / Volume 共通: シリンダーの 2 倍の水色ぽち */
+    --slider-thumb-dot: calc(var(--slider-track-thickness) * 2);
+    --horizontal-thumb-overflow: calc(var(--slider-thumb-dot) / 2);
+
+    /*
+      一般的な PC 幅を 1440px とし、そこでは左右余白 1 割ずつ（コンテンツ 80%）。
+      - それより広い: 左右 10% のまま拡大
+      - それより狭い: コンテンツ幅を維持しつつ余白だけ削る
+      - さらに狭い: 最小余白まで削ったあとコンテンツが縮む
+    */
+    --pc-typical-width: 1440px;
+    --pc-content-width: calc(var(--pc-typical-width) * 0.8); /* 1152px */
+    --page-inline-min: 16px;
+    /* PC: 旧 clamp(16px, 4vw, 40px) の 1.5 倍 */
+    --page-top: clamp(24px, 6vw, 60px);
+    --page-bottom: clamp(24px, 6vw, 60px);
+    /* スマホ: 題名上の余白 */
+    --page-top-mobile: 40px;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
     background-color: #ffffff;
     color: #000000;
-    padding: 40px;
+    /* 左右余白は #rnbo-root 側で制御。上下のみ */
+    padding: var(--page-top) 0 var(--page-bottom);
 }
 
 /* ─────────────────────────────
@@ -37,33 +58,58 @@ body {
 #rnbo-root {
     position: relative;
     z-index: 1;
-    max-width: 1400px;
-    margin: 0 auto;
+    /*
+      width = min(
+        max(80vw, 基準コンテンツ幅),  ← 広いとき 80vw / 狭まり始めは余白優先で削る
+        100% - 最小左右余白
+      )
+    */
+    width: min(
+        max(80vw, var(--pc-content-width)),
+        calc(100% - (var(--page-inline-min) * 2))
+    );
+    max-width: none;
+    margin-inline: auto;
 }
 
 /* ─────────────────────────────
-   Title
+   Title row: RASM demo | Volume | 44.1kHz
 ────────────────────────────── */
 
 .title-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 40px;
+    gap: clamp(12px, 2.5vw, 28px);
+    /* Volume と Tuning の間: 旧 clamp(24px, 4vw, 40px) の 1.5 倍 */
+    margin-bottom: clamp(36px, 6vw, 60px);
 }
 
 #custom-title {
-    font-size: 48px;
-    font-weight: 300;
+    font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
     margin: 0;
+    flex-shrink: 0;
+}
+
+.title-volume {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 160px;
+}
+
+.title-volume .horizontal-slider-container {
+    flex: 1;
+    height: var(--slider-row-height);
+    min-width: 80px;
 }
 
 .title-samplerate {
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    margin-left: auto;
 }
 
 /* ─────────────────────────────
@@ -76,12 +122,6 @@ body {
     align-items: stretch;
 }
 
-.left-column {
-    flex: 1.5 1 0;
-    display: flex;
-    flex-direction: column;
-}
-
 /* ─────────────────────────────
    Section Common
 ────────────────────────────── */
@@ -91,134 +131,6 @@ body {
     margin-bottom: 15px;
 }
 
-.volume-control,
-.tuning-control {
-    border: 2px solid #000;
-}
-
-/* ─────────────────────────────
-   Volume
-────────────────────────────── */
-
-.volume-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.volume-control {
-    padding: 20px 0;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Volume 専用ラベル */
-.volume-label {
-    font-size: 14px;
-    transform: translateX(-20px);
-}
-
-/* ─────────────────────────────
-   Vertical Slider (Common)
-────────────────────────────── */
-
-.vertical-slider-container {
-    position: relative;
-    width: 100%;
-    height: 450px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 30px;
-}
-
-/* 細いシリンダー状の縦レール（Volume 用） */
-.vertical-slider-container::before {
-    content: "";
-    position: absolute;
-    width: var(--slider-track-thickness);
-    top: 20px;
-    bottom: 20px;
-    background: #000;
-    border-radius: 999px;
-    left: calc(50% - 20px - (var(--slider-track-thickness) / 2) + 1px);
-}
-
-.vertical-slider {
-    writing-mode: vertical-lr;
-    direction: rtl;
-    width: var(--slider-thumb-cross);
-    height: 100%;
-    background: transparent;
-    appearance: none;
-    cursor: pointer;
-}
-
-.vertical-slider::-webkit-slider-runnable-track {
-    width: var(--slider-track-thickness);
-    background: transparent;
-    border: none;
-}
-
-.vertical-slider::-moz-range-track {
-    width: var(--slider-track-thickness);
-    background: transparent;
-    border: none;
-}
-
-/* ─────────────────────────────
-   Cylinder Thumb（縦・横共通）
-────────────────────────────── */
-
-.vertical-slider::-webkit-slider-thumb,
-.horizontal-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    background: #aef2f2;
-    border: 2px solid #000;
-    border-radius: 999px;
-    box-shadow: none;
-    cursor: pointer;
-}
-
-/* 縦: レールを横切る短いシリンダー */
-.vertical-slider::-webkit-slider-thumb {
-    width: var(--slider-thumb-cross);
-    height: var(--slider-thumb-along);
-}
-
-.vertical-slider::-moz-range-thumb {
-    width: var(--slider-thumb-cross);
-    height: var(--slider-thumb-along);
-    background: #aef2f2;
-    border: 2px solid #000;
-    border-radius: 999px;
-    cursor: pointer;
-}
-
-/* ─────────────────────────────
-   Meter (Volume only)
-────────────────────────────── */
-
-#meter {
-    width: 10px;
-    height: 100%;
-    border: 2px solid #000;
-    border-radius: 999px;
-    display: flex;
-    align-items: flex-end;
-    overflow: hidden;
-}
-
-#bar {
-    width: 100%;
-    height: 0%;
-    background-color: #aef2f2;
-    transition: height 0.2s ease;
-}
 
 /* ─────────────────────────────
    Sample Rate (title row)
@@ -242,7 +154,7 @@ body {
 
 /* オフ時は 44.1kHz を灰色に */
 .sr-switch:has(input:not(:checked)) .sr-switch-caption {
-    color: #999;
+    color: var(--slider-line-color);
     opacity: 1;
 }
 
@@ -260,7 +172,7 @@ body {
     width: 52px;
     height: 28px;
     flex-shrink: 0;
-    border: 2px solid #000;
+    border: 1px solid var(--slider-line-color);
     border-radius: 14px;
     background: #fff;
     transition: background 0.2s ease;
@@ -268,11 +180,11 @@ body {
 
 .sr-switch-thumb {
     position: absolute;
-    top: 2px;
-    left: 2px;
+    top: 3px;
+    left: 3px;
     width: 20px;
     height: 20px;
-    border: 2px solid #000;
+    border: 1px solid var(--slider-line-color);
     border-radius: 50%;
     background: #fff;
     transition: transform 0.2s ease, background 0.2s ease;
@@ -283,7 +195,7 @@ body {
 }
 
 .sr-switch input:checked + .sr-switch-track .sr-switch-thumb {
-    transform: translateX(24px);
+    transform: translateX(26px);
 }
 
 .sr-switch input:focus-visible + .sr-switch-track {
@@ -296,17 +208,18 @@ body {
 ────────────────────────────── */
 
 .tuning-section {
-    flex: 8.5 1 0;
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
 }
 
 .tuning-control {
-    padding: 40px;
+    padding: clamp(20px, 4vw, 40px);
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: clamp(8px, 2vw, 16px);
 }
 
 /* ─────────────────────────────
@@ -314,39 +227,48 @@ body {
 ────────────────────────────── */
 
 .slider-group {
-    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2.5vw, 24px);
+    margin-bottom: clamp(16px, 3vw, 28px);
 }
 
 .slider-group:last-child {
     margin-bottom: 0;
 }
 
-.slider-label-container {
-    text-align: center;
-    margin-bottom: 6px;
-}
-
 .slider-label {
-    font-size: 16px;
-    font-weight: 400;
+    flex-shrink: 0;
+    width: clamp(7em, 18vw, 10.5em);
+    font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
+    font-size: clamp(14px, 2.2vw, 16px);
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .horizontal-slider-container {
     --fill: 0%;
+    /* コンテナ垂直中央 = シリンダー / 目盛り / ぽちの共通基準線 */
+    --slider-center-y: 50%;
     position: relative;
-    width: 100%;
-    height: 48px;
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    height: var(--slider-row-height);
 }
 
 .horizontal-slider {
     appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(-1 * var(--horizontal-thumb-overflow));
     width: calc(100% + (var(--horizontal-thumb-overflow) * 2));
-    margin-left: calc(-1 * var(--horizontal-thumb-overflow));
-    margin-right: calc(-1 * var(--horizontal-thumb-overflow));
-    height: 48px;
+    height: 100%;
+    margin: 0;
     background: transparent;
     cursor: pointer;
-    position: relative;
     z-index: 2;
 }
 
@@ -362,51 +284,52 @@ body {
     border: none;
 }
 
-/* 横: レールを横切る短いシリンダー */
+/* シリンダー中心に乗る水色ぽち */
 .horizontal-slider::-webkit-slider-thumb {
-    width: var(--slider-thumb-along);
-    height: var(--slider-thumb-cross);
+    -webkit-appearance: none;
+    appearance: none;
+    width: var(--slider-thumb-dot);
+    height: var(--slider-thumb-dot);
+    background: #aef2f2;
+    border: none;
+    border-radius: 999px;
+    box-shadow: none;
+    cursor: pointer;
+    /* runnable-track 上端基準 → トラック中央にぽち中央を合わせる */
+    margin-top: calc((var(--slider-track-thickness) - var(--slider-thumb-dot)) / 2);
 }
 
 .horizontal-slider::-moz-range-thumb {
-    width: var(--slider-thumb-along);
-    height: var(--slider-thumb-cross);
+    width: var(--slider-thumb-dot);
+    height: var(--slider-thumb-dot);
     background: #aef2f2;
-    border: 2px solid #000;
+    border: none;
     border-radius: 999px;
     cursor: pointer;
 }
 
 /* ─────────────────────────────
-   Ticks & Range Labels
+   Ticks
 ────────────────────────────── */
-
-.slider-range-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 6px;
-}
 
 .slider-ticks {
     position: absolute;
-    top: 50%;
-    left: 0;
+    inset: 0;
     width: 100%;
-    height: 28px;
-    transform: translateY(-50%);
+    height: 100%;
     pointer-events: none;
     z-index: 1;
 }
 
-/* 細いシリンダー状の横レール: つまみ左=水色 / 右=透明 */
+/* Tuning: つまみ左=水色 / 右=透明 */
 .slider-ticks::before {
     content: "";
     position: absolute;
     left: 0;
-    top: 50%;
+    top: var(--slider-center-y);
     width: 100%;
     height: var(--slider-track-thickness);
-    border: 1.5px solid #000;
+    border: var(--slider-track-border) solid var(--slider-line-color);
     border-radius: 999px;
     box-sizing: border-box;
     background: linear-gradient(
@@ -422,12 +345,142 @@ body {
 
 .slider-ticks .tick {
     position: absolute;
-    top: 50%;
-    width: 1.5px;
+    top: var(--slider-center-y);
+    width: var(--slider-tick-width);
     /* 枠線の内側だけに収める */
-    height: calc(var(--slider-track-thickness) - 3px);
-    background: #000;
+    height: calc(var(--slider-track-thickness) - (var(--slider-track-border) * 2));
+    background: var(--slider-line-color);
     border-radius: 1px;
-    transform: translate(-0.75px, -50%);
+    transform: translate(-50%, -50%);
     z-index: 1;
+}
+
+/* ─────────────────────────────
+   Volume (title row): 実音量をシリンダー内に表示
+────────────────────────────── */
+
+.volume-slider-container .slider-ticks::before {
+    /* パラメータ塗りは使わず、透明シリンダー + メーター塗り */
+    background: transparent;
+}
+
+.volume-slider-container .horizontal-slider::-webkit-slider-thumb {
+    background: #000;
+}
+
+.volume-slider-container .horizontal-slider::-moz-range-thumb {
+    background: #000;
+}
+
+.volume-meter-fill {
+    position: absolute;
+    left: var(--slider-track-border);
+    top: var(--slider-center-y);
+    height: calc(var(--slider-track-thickness) - (var(--slider-track-border) * 2));
+    width: 0%;
+    max-width: calc(100% - (var(--slider-track-border) * 2));
+    background: #aef2f2;
+    border-radius: 999px;
+    transform: translateY(-50%);
+    transition: width 0.1s ease;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ─────────────────────────────
+   Responsive
+────────────────────────────── */
+
+/* 1440px 以上: Tuning 外枠を復活（灰色 1px / 角は直径約 50px = radius 25px） */
+@media (min-width: 1440px) {
+    .tuning-control {
+        border: 1px solid var(--slider-line-color);
+        border-radius: 25px;
+    }
+}
+
+/*
+  2行ヘッダー（中間幅〜iPhone共通）:
+  1行目: RASM demo ………… 44.1kHz スイッチ
+  2行目: Volume メーター
+  シリンダー: 10 → 8px
+*/
+@media (max-width: 900px) {
+    :root {
+        --slider-track-thickness: 8px;
+        --slider-track-border: 1px;
+        --slider-tick-width: 1px;
+        --slider-row-height: 55px;
+    }
+
+    .title-row {
+        flex-wrap: wrap;
+        align-items: center;
+        row-gap: 16px;
+    }
+
+    #custom-title {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .title-samplerate {
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+
+    .title-volume {
+        order: 3;
+        flex: 1 1 100%;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .title-volume .horizontal-slider-container {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .slider-label {
+        width: 9em;
+    }
+}
+
+/*
+  iPhone 幅: ヘッダー2行は維持 / パラメータは各2行・Volumeと同幅
+  シリンダー: 8 → 6px / 行間を広げる
+*/
+@media (max-width: 480px) {
+    :root {
+        --slider-track-thickness: 5px;
+        --slider-track-border: 1px;
+        --slider-tick-width: 1px;
+        --slider-row-height: 50px;
+        --page-top: var(--page-top-mobile);
+    }
+
+    .tuning-control {
+        justify-content: flex-start;
+        gap: 36px;
+        /* Volume メーターと同じく幅いっぱい（左右パディングなし） */
+        padding: 0;
+    }
+
+    .slider-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    .slider-label {
+        width: 100%;
+        font-size: 15px;
+        text-align: left;
+    }
+
+    .horizontal-slider-container {
+        width: 100%;
+    }
 }
