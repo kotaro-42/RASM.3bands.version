@@ -19,7 +19,25 @@
     <svg id="background" width="100%" height="100%"></svg>
 
     <div id="rnbo-root">
-        <h1 id="custom-title">RASM demo</h1>
+        <div class="title-row">
+            <h1 id="custom-title">RASM demo</h1>
+
+            <div class="title-samplerate">
+                <!-- オフ=48kHz（初期） / オン=44.1kHz -->
+                <label class="sr-switch" for="samplerate-toggle">
+                    <span class="sr-switch-caption">44.1kHz</span>
+                    <input
+                        type="checkbox"
+                        id="samplerate-toggle"
+                        role="switch"
+                        aria-label="44.1kHz sample rate"
+                    >
+                    <span class="sr-switch-track" aria-hidden="true">
+                        <span class="sr-switch-thumb"></span>
+                    </span>
+                </label>
+            </div>
+        </div>
 
         <div class="controls-container">
 
@@ -33,10 +51,15 @@
                         <span class="volume-label">high</span>
 
                         <div class="vertical-slider-container">
+                            <!-- 初期値は export/rasm_origin.json の volume.initialValue=7 に合わせる -->
                             <input
                                 type="range"
                                 id="volume-slider"
                                 class="vertical-slider"
+                                min="0"
+                                max="10"
+                                step="1"
+                                value="7"
                             >
 
                             <div id="meter">
@@ -45,31 +68,6 @@
                         </div>
 
                         <span class="volume-label">low</span>
-                    </div>
-                </div>
-
-                <!-- ───────── Setting : Sample Rate ───────── -->
-                <div class="setting-section">
-                    <h2 class="section-title">Sample rate</h2>
-                    <div class="setting-control">
-                
-                        <!-- 上：48kHz -->
-                        <span class="volume-label setting-label">48kHz</span>
-                                        
-                        <div class="vertical-slider-container">
-                            <input
-                                type="range"
-                                id="samplerate-slider"
-                                class="vertical-slider"
-                                min="0"
-                                max="1"
-                                step="1"
-                            >
-                        </div>
-                
-                        <!-- 下：44.1kHz -->
-                        <span class="volume-label setting-label">44.1kHz</span>
-                                        
                     </div>
                 </div>
 
@@ -87,10 +85,15 @@
                         </div>
                         <div class="horizontal-slider-container">
                             <div class="slider-ticks" data-steps="12"></div>
+                            <!-- RNBO sensitivity.initialValue=7・UIは逆転表示なので 12-7=5 -->
                             <input
                                 type="range"
                                 id="sensitivity-slider"
                                 class="horizontal-slider"
+                                min="0"
+                                max="12"
+                                step="1"
+                                value="5"
                             >
                         </div>
                         <div class="slider-range-labels">
@@ -105,10 +108,15 @@
                         </div>
                         <div class="horizontal-slider-container">
                             <div class="slider-ticks" data-steps="4"></div>
+                            <!-- RNBO dynamics.initialValue=4 -->
                             <input
                                 type="range"
                                 id="dynamics-slider"
                                 class="horizontal-slider"
+                                min="0"
+                                max="4"
+                                step="1"
+                                value="4"
                             >
                         </div>
                         <div class="slider-range-labels">
@@ -123,10 +131,15 @@
                         </div>
                         <div class="horizontal-slider-container">
                             <div class="slider-ticks" data-steps="10"></div>
+                            <!-- RNBO responsiveness.initialValue=4・UIは逆転表示なので 10-4=6 -->
                             <input
                                 type="range"
                                 id="responsiveness-slider"
                                 class="horizontal-slider"
+                                min="0"
+                                max="10"
+                                step="1"
+                                value="6"
                             >
                         </div>
                         <div class="slider-range-labels">
@@ -141,10 +154,15 @@
                         </div>
                         <div class="horizontal-slider-container">
                             <div class="slider-ticks" data-steps="10"></div>
+                            <!-- RNBO release.initialValue=4 -->
                             <input
                                 type="range"
                                 id="release-slider"
                                 class="horizontal-slider"
+                                min="0"
+                                max="10"
+                                step="1"
+                                value="4"
                             >
                         </div>
                         <div class="slider-range-labels">

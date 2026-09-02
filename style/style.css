@@ -9,7 +9,11 @@
 }
 
 :root {
-    --horizontal-thumb-overflow: 12px;
+    --slider-track-thickness: 5px;
+    /* シリンダーつまみ: レールを横切る長い辺 / 進行方向の短い辺 */
+    --slider-thumb-cross: 26px;
+    --slider-thumb-along: 11px;
+    --horizontal-thumb-overflow: calc(var(--slider-thumb-along) / 2);
 }
 
 body {
@@ -41,10 +45,25 @@ body {
    Title
 ────────────────────────────── */
 
+.title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
 #custom-title {
     font-size: 48px;
     font-weight: 300;
-    margin-bottom: 40px;
+    margin: 0;
+}
+
+.title-samplerate {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 /* ─────────────────────────────
@@ -61,7 +80,6 @@ body {
     flex: 1.5 1 0;
     display: flex;
     flex-direction: column;
-    gap: 24px;
 }
 
 /* ─────────────────────────────
@@ -74,7 +92,6 @@ body {
 }
 
 .volume-control,
-.setting-control,
 .tuning-control {
     border: 2px solid #000;
 }
@@ -84,6 +101,7 @@ body {
 ────────────────────────────── */
 
 .volume-section {
+    flex: 1;
     display: flex;
     flex-direction: column;
 }
@@ -117,59 +135,68 @@ body {
     gap: 30px;
 }
 
-/* 黒い縦ガイド（Volume 用） */
+/* 細いシリンダー状の縦レール（Volume 用） */
 .vertical-slider-container::before {
     content: "";
     position: absolute;
-    width: 2px;
+    width: var(--slider-track-thickness);
     top: 20px;
     bottom: 20px;
     background: #000;
-    left: calc(50% - 20px);
+    border-radius: 999px;
+    left: calc(50% - 20px - (var(--slider-track-thickness) / 2) + 1px);
 }
 
 .vertical-slider {
     writing-mode: vertical-lr;
     direction: rtl;
-    width: 6px;
+    width: var(--slider-thumb-cross);
     height: 100%;
     background: transparent;
     appearance: none;
+    cursor: pointer;
+}
+
+.vertical-slider::-webkit-slider-runnable-track {
+    width: var(--slider-track-thickness);
+    background: transparent;
+    border: none;
+}
+
+.vertical-slider::-moz-range-track {
+    width: var(--slider-track-thickness);
+    background: transparent;
+    border: none;
 }
 
 /* ─────────────────────────────
-   Thumb Shape（縦・横共通）
+   Cylinder Thumb（縦・横共通）
 ────────────────────────────── */
 
 .vertical-slider::-webkit-slider-thumb,
 .horizontal-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     background: #aef2f2;
     border: 2px solid #000;
-    clip-path: polygon(
-        25% 0%, 75% 0%,
-        100% 50%,
-        75% 100%, 25% 100%,
-        0% 50%
-    );
+    border-radius: 999px;
+    box-shadow: none;
+    cursor: pointer;
 }
 
+/* 縦: レールを横切る短いシリンダー */
 .vertical-slider::-webkit-slider-thumb {
-    width: 30px;
-    height: 20px;
+    width: var(--slider-thumb-cross);
+    height: var(--slider-thumb-along);
 }
 
 .vertical-slider::-moz-range-thumb {
-    width: 30px;
-    height: 20px;
+    width: var(--slider-thumb-cross);
+    height: var(--slider-thumb-along);
     background: #aef2f2;
     border: 2px solid #000;
-    clip-path: polygon(
-        25% 0%, 75% 0%,
-        100% 50%,
-        75% 100%, 25% 100%,
-        0% 50%
-    );
+    border-radius: 999px;
+    cursor: pointer;
 }
 
 /* ─────────────────────────────
@@ -180,8 +207,10 @@ body {
     width: 10px;
     height: 100%;
     border: 2px solid #000;
+    border-radius: 999px;
     display: flex;
     align-items: flex-end;
+    overflow: hidden;
 }
 
 #bar {
@@ -192,37 +221,74 @@ body {
 }
 
 /* ─────────────────────────────
-   Setting : Sample Rate
+   Sample Rate (title row)
 ────────────────────────────── */
 
-.setting-control {
-    padding: 20px;
-}
-
-/* Sample rate 用ラベル（唯一の制御点） */
-.setting-label {
+.sr-switch {
     position: relative;
-    left: 50%;
-    transform: translateX(-50%); /* ← ここを微調整 */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sr-switch-caption {
     font-size: 14px;
+    color: #000;
+    white-space: nowrap;
+    transition: color 0.2s ease, opacity 0.2s ease;
 }
 
-/* Sample rate スライダー寸法 */
-.setting-section .vertical-slider-container {
-    height: 120px;
+/* オフ時は 44.1kHz を灰色に */
+.sr-switch:has(input:not(:checked)) .sr-switch-caption {
+    color: #999;
+    opacity: 1;
 }
 
-/* 黒い縦棒（中央・短縮） */
-.setting-section .vertical-slider-container::before {
-    left: 50%;
-    transform: translateX(-50%);
-    top: 20px;
-    bottom: 20px;
+.sr-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    pointer-events: none;
 }
 
-/* 可動域 */
-.setting-section .vertical-slider {
-    height: 80px;
+.sr-switch-track {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+    border: 2px solid #000;
+    border-radius: 14px;
+    background: #fff;
+    transition: background 0.2s ease;
+}
+
+.sr-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #000;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.sr-switch input:checked + .sr-switch-track {
+    background: #aef2f2;
+}
+
+.sr-switch input:checked + .sr-switch-track .sr-switch-thumb {
+    transform: translateX(24px);
+}
+
+.sr-switch input:focus-visible + .sr-switch-track {
+    outline: 2px solid #000;
+    outline-offset: 3px;
 }
 
 /* ─────────────────────────────
@@ -266,9 +332,10 @@ body {
 }
 
 .horizontal-slider-container {
+    --fill: 0%;
     position: relative;
     width: 100%;
-    height: 60px;
+    height: 48px;
 }
 
 .horizontal-slider {
@@ -276,29 +343,38 @@ body {
     width: calc(100% + (var(--horizontal-thumb-overflow) * 2));
     margin-left: calc(-1 * var(--horizontal-thumb-overflow));
     margin-right: calc(-1 * var(--horizontal-thumb-overflow));
-    height: 60px;
+    height: 48px;
     background: transparent;
     cursor: pointer;
     position: relative;
     z-index: 2;
 }
 
+.horizontal-slider::-webkit-slider-runnable-track {
+    height: var(--slider-track-thickness);
+    background: transparent;
+    border: none;
+}
+
+.horizontal-slider::-moz-range-track {
+    height: var(--slider-track-thickness);
+    background: transparent;
+    border: none;
+}
+
+/* 横: レールを横切る短いシリンダー */
 .horizontal-slider::-webkit-slider-thumb {
-    width: 20px;
-    height: 30px;
+    width: var(--slider-thumb-along);
+    height: var(--slider-thumb-cross);
 }
 
 .horizontal-slider::-moz-range-thumb {
-    width: 20px;
-    height: 30px;
+    width: var(--slider-thumb-along);
+    height: var(--slider-thumb-cross);
     background: #aef2f2;
     border: 2px solid #000;
-    clip-path: polygon(
-        25% 0%, 75% 0%,
-        100% 50%,
-        75% 100%, 25% 100%,
-        0% 50%
-    );
+    border-radius: 999px;
+    cursor: pointer;
 }
 
 /* ─────────────────────────────
@@ -316,27 +392,42 @@ body {
     top: 50%;
     left: 0;
     width: 100%;
-    height: 24px;
+    height: 28px;
     transform: translateY(-50%);
     pointer-events: none;
+    z-index: 1;
 }
 
+/* 細いシリンダー状の横レール: つまみ左=水色 / 右=透明 */
 .slider-ticks::before {
     content: "";
     position: absolute;
     left: 0;
     top: 50%;
     width: 100%;
-    height: 2px;
-    background: #000;
+    height: var(--slider-track-thickness);
+    border: 1.5px solid #000;
+    border-radius: 999px;
+    box-sizing: border-box;
+    background: linear-gradient(
+        to right,
+        #aef2f2 0%,
+        #aef2f2 var(--fill),
+        transparent var(--fill),
+        transparent 100%
+    );
     transform: translateY(-50%);
+    z-index: 0;
 }
 
 .slider-ticks .tick {
     position: absolute;
     top: 50%;
-    width: 2px;
-    height: 18px;
+    width: 1.5px;
+    /* 枠線の内側だけに収める */
+    height: calc(var(--slider-track-thickness) - 3px);
     background: #000;
-    transform: translate(-1px, -50%);
+    border-radius: 1px;
+    transform: translate(-0.75px, -50%);
+    z-index: 1;
 }

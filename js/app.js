@@ -3,6 +3,9 @@
 // RNBO Web Audio Device Setup
 // =====================================
 
+// パッチ初期化用のジグル中は UI 追従を止める（つまみが一瞬動くのを防ぐ）
+let suppressParameterUiSync = false;
+
 async function setup() {
     const patchURL = "export/rasm_origin.json";
 
@@ -54,6 +57,7 @@ async function setup() {
 
     // 呼び出し順
     connectCustomSliders(device);  // RNBO param <-> Slider
+    connectSampleRateToggle(device);
     generateAllTicks();            // 各スライダーに ticks を DOM 生成
 
     // AudioContext 再開後に sensitivity をジグルしてパッチを初期化する
@@ -64,8 +68,12 @@ async function setup() {
         const p = device.parameters.find(x => x.name === "sensitivity");
         if (!p) return;
         const saved = p.value;
+        suppressParameterUiSync = true;
         p.value = saved >= 1 ? saved - 1 : saved + 1;
-        setTimeout(() => { p.value = saved; }, 50);
+        setTimeout(() => {
+            p.value = saved;
+            suppressParameterUiSync = false;
+        }, 50);
     };
 
     // 自動起動を試みる（localhost など許可環境では即時起動）
@@ -106,7 +114,8 @@ function generateTicksFor(container, steps) {
 
     const count = steps + 1;
 
-    for (let i = 0; i < count; i++) {
+    // 両端（0% / 100%）の目盛りは描画しない
+    for (let i = 1; i < count - 1; i++) {
         const t = document.createElement("div");
         t.className = "tick";
 
@@ -132,27 +141,41 @@ function generateAllTicks() {
 // =====================================
 // RNBO <-> Custom Slider Mapping
 // =====================================
+
+// UI だけの表示仕様。min/max/step/初期値は RNBO パラメータから取る
+const UI_META = {
+    volume:         { invert: false },
+    sensitivity:    { invert: true },
+    dynamics:       { invert: false },
+    responsiveness: { invert: true },
+    release:        { invert: false }
+};
+
+function stepFromRnboParam(p) {
+    const min = Number(p.min);
+    const max = Number(p.max);
+    const steps = Number(p.steps);
+    if (!Number.isFinite(min) || !Number.isFinite(max)) return 0;
+    if (!Number.isFinite(steps) || steps <= 1) return 0;
+    return (max - min) / (steps - 1);
+}
+
+function updateHorizontalFill(slider) {
+    const container = slider.closest(".horizontal-slider-container");
+    if (!container) return;
+
+    const min = Number(slider.min);
+    const max = Number(slider.max);
+    const val = Number(slider.value);
+    const pct = max === min ? 0 : ((val - min) / (max - min)) * 100;
+    container.style.setProperty("--fill", `${pct}%`);
+}
+
+function syncAllHorizontalFills() {
+    document.querySelectorAll(".horizontal-slider").forEach(updateHorizontalFill);
+}
+
 function connectCustomSliders(device) {
-
-    // ★ ここが RNBO 側と合わせ込むパラメータ仕様 ★
-    //   → RNBO パッチ内も同様に 0〜… の範囲になっている前提
-    const specs = {
-        // volume は 0〜10（UI上も 0〜10）
-        volume:         { min: 0, max: 10, invert: false, step: 0.1 },
-
-        // sensitivity: 0〜12（13段階）・逆転項目
-        sensitivity:    { min: 0, max: 12, invert: true,  step: 1 },
-
-        // dynamics: 0〜4（5段階）
-        dynamics:       { min: 0, max: 4,  invert: false, step: 1 },
-
-        // responsiveness: 0〜10（11段階）・逆転項目
-        responsiveness: { min: 0, max: 10, invert: true,  step: 1 },
-
-        // release: 0〜10
-        release:        { min: 0, max: 10, invert: false, step: 1 }
-    };
-
     const mapping = [
         { ui: "volume-slider",         param: "volume" },
         { ui: "sensitivity-slider",    param: "sensitivity" },
@@ -164,50 +187,51 @@ function connectCustomSliders(device) {
     mapping.forEach(({ ui, param }) => {
         const slider = document.getElementById(ui);
         const p = device.parameters.find(x => x.name === param);
-        if (!slider || !p) return;
+        const meta = UI_META[param];
+        if (!slider || !p || !meta) return;
 
-        const spec = specs[param];
-        if (!spec) return;
+        const min = Number(p.min);
+        const max = Number(p.max);
+        const step = stepFromRnboParam(p);
 
         // HTML の min/max/step も RNBO と合わせる
-        slider.min = spec.min;
-        slider.max = spec.max;
-        if (spec.step > 0) {
-            slider.step = spec.step;
+        slider.min = min;
+        slider.max = max;
+        if (step > 0) {
+            slider.step = step;
         } else {
             slider.removeAttribute("step");
         }
 
         // Param → Slider
         const paramToSlider = (v) => {
-            let val = v;
-            if (spec.invert) {
-                // 逆転：0 <-> max
-                val = spec.max - v;
+            let val = Number(v);
+            if (meta.invert) {
+                val = max - val;
             }
             return val;
         };
 
         // Slider → Param
         const sliderToParam = (v) => {
-            let raw = v;
-            if (spec.invert) {
-                raw = spec.max - v;
+            let raw = Number(v);
+            if (meta.invert) {
+                raw = max - raw;
             }
 
-            if (spec.step > 0) {
-                raw = Math.round(raw / spec.step) * spec.step;
+            if (step > 0) {
+                raw = Math.round((raw - min) / step) * step + min;
             }
 
-            // 安全クリップ
-            if (raw < spec.min) raw = spec.min;
-            if (raw > spec.max) raw = spec.max;
+            if (raw < min) raw = min;
+            if (raw > max) raw = max;
 
             return raw;
         };
 
-        // 初期値反映：RNBO の値を UI に
+        // 初期値反映：RNBO の値を UI に（システム側が単一ソース）
         slider.value = paramToSlider(p.value);
+        updateHorizontalFill(slider);
 
         // UI → RNBO
         slider.addEventListener("input", (e) => {
@@ -216,13 +240,45 @@ function connectCustomSliders(device) {
             if (p.value !== paramValue) {
                 p.value = paramValue;
             }
+            updateHorizontalFill(slider);
         });
 
         // RNBO → UI（外部から param が変わったときも追従）
         device.parameterChangeEvent.subscribe(ev => {
+            if (suppressParameterUiSync) return;
             if (ev.id !== p.id) return;
             slider.value = paramToSlider(ev.value);
+            updateHorizontalFill(slider);
         });
+    });
+}
+
+function connectSampleRateToggle(device) {
+    const toggle = document.getElementById("samplerate-toggle");
+    const p = device.parameters.find(x => x.name === "samplerate");
+    if (!toggle || !p) return;
+
+    // 44.1kHz スイッチ: ON=44.1kHz / OFF=48kHz（初期は OFF）
+    const rate441 = Number(p.min);
+    const rate48 = Number(p.max);
+    const midpoint = (rate441 + rate48) / 2;
+
+    const paramToChecked = (v) => Number(v) < midpoint;
+    const checkedToParam = (checked) => (checked ? rate441 : rate48);
+
+    toggle.checked = paramToChecked(p.value);
+
+    toggle.addEventListener("change", () => {
+        const next = checkedToParam(toggle.checked);
+        if (p.value !== next) {
+            p.value = next;
+        }
+    });
+
+    device.parameterChangeEvent.subscribe(ev => {
+        if (suppressParameterUiSync) return;
+        if (ev.id !== p.id) return;
+        toggle.checked = paramToChecked(ev.value);
     });
 }
 
@@ -255,4 +311,6 @@ function updateMeter(level) {
 }
 
 // =====================================
+// RNBO 接続前でも HTML 初期値で塗りを合わせる
+syncAllHorizontalFills();
 setup();
